@@ -164,17 +164,20 @@
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
-        <div id="section-diary" class="content-section">
-            <h2>✏️ 감정 일기 작성</h2>
-            <select id="diary-score">
-                <option value="5">매우 좋음 😊</option>
-                <option value="3" selected>보통 😐</option>
-                <option value="1">매우 힘듦 😢</option>
-            </select>
-            <textarea id="diary-content" rows="5" placeholder="오늘의 마음을 남겨주세요."></textarea>
-            <button onclick="saveMood()">저장하기</button>
-            <button onclick="showSection('home')" class="btn-home">홈으로</button>
-        </div>
+   <div id="section-diary" class="content-section">
+    <h2>✏️ 감정 일기 작성</h2>
+    <label for="diary-score" style="font-size: 14px; color: var(--sub-text);">오늘의 기분은 몇 점인가요?</label>
+    <select id="diary-score">
+        <option value="5">매우 좋음 😊 (5점)</option>
+        <option value="4">좋음 🙂 (4점)</option>
+        <option value="3" selected>보통 😐 (3점)</option>
+        <option value="2">힘듦 😟 (2점)</option>
+        <option value="1">매우 힘듦 😢 (1점)</option>
+    </select>
+    <textarea id="diary-content" rows="5" placeholder="오늘의 구체적인 마음을 남겨주세요."></textarea>
+    <button onclick="saveMood()">저장하기</button>
+    <button onclick="showSection('home')" class="btn-home">홈으로</button>
+</div>
 
         <div id="section-community" class="content-section">
             <h2>🤝 마음 나눔 게시판</h2>
