@@ -5,7 +5,7 @@
     <title>🌿 마음 테라피 플랫폼</title>
     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         /* 테마 변수 설정 */
         :root { 
@@ -36,7 +36,7 @@
             line-height: 1.6; 
             transition: background 0.3s, color 0.3s;
         }
-        
+
         /* 네비게이션 */
         nav { 
             display: flex; justify-content: space-between; padding: 15px 10%; 
@@ -49,10 +49,30 @@
         .nav-links a { margin-left: 15px; text-decoration: none; color: var(--sub-text); cursor: pointer; font-weight: 500; font-size: 14px; }
         .user-info { font-size: 14px; color: var(--main-color); font-weight: bold; margin-right: 10px; }
 
+        /* 네비게이션 아이콘 항목 */
+        .nav-item {
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: var(--sub-text);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-item:hover {
+            background: var(--accent-color);
+        }
+
         /* 다크모드 토글 버튼 */
         .theme-toggle {
             background: none; border: 1px solid var(--main-color); color: var(--main-color);
-            padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-left: 15px; width: auto;
+            padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 16px; margin-left: 15px; width: auto;
         }
 
         /* 메인 컨테이너 */
@@ -90,7 +110,7 @@
         }
         .stats-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
         .chart-box { background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); height: 300px; }
-        
+
         /* 공통 UI */
         input, textarea, select { 
             width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border-color); 
@@ -98,7 +118,7 @@
         }
         button { padding: 12px 25px; background: var(--main-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         .btn-home { background: #9e9e9e; width: auto; margin-top: 20px; }
-        
+
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; z-index: 1000; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); flex-direction: column; color: white; }
         video { width: 90%; max-width: 450px; border-radius: 15px; border: 3px solid var(--main-color); }
     </style>
@@ -109,10 +129,10 @@
         <div class="logo" onclick="location.reload()">🌿 마음 테라피</div>
         <div class="nav-links" id="nav-menu">
             <span id="user-display" class="user-info"></span>
-            <a onclick="showSection('home')">홈</a>
-            <a onclick="showSection('docs')">자료실</a>
-            <a id="auth-btn" onclick="showSection('login')">로그인</a>
-            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 다크모드</button>
+            <div class="nav-item" onclick="showSection('home')">🏠 <span>홈</span></div>
+            <div class="nav-item" onclick="showSection('docs')">📁 <span>자료실</span></div>
+            <div class="nav-item" id="auth-btn" onclick="showSection('login')">🔑 <span>로그인</span></div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
         </div>
     </nav>
 
@@ -152,7 +172,8 @@
 
         <div id="section-docs" class="content-section">
             <h2>📚 전문 자료실</h2>
-            <div id="docs-list"></div> <button onclick="showSection('home')" class="btn-home">홈으로</button>
+            <div id="docs-list"></div>
+            <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
         <div id="section-record" class="content-section">
@@ -164,20 +185,17 @@
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
-   <div id="section-diary" class="content-section">
-    <h2>✏️ 감정 일기 작성</h2>
-    <label for="diary-score" style="font-size: 14px; color: var(--sub-text);">오늘의 기분은 몇 점인가요?</label>
-    <select id="diary-score">
-        <option value="5">매우 좋음 😊 (5점)</option>
-        <option value="4">좋음 🙂 (4점)</option>
-        <option value="3" selected>보통 😐 (3점)</option>
-        <option value="2">힘듦 😟 (2점)</option>
-        <option value="1">매우 힘듦 😢 (1점)</option>
-    </select>
-    <textarea id="diary-content" rows="5" placeholder="오늘의 구체적인 마음을 남겨주세요."></textarea>
-    <button onclick="saveMood()">저장하기</button>
-    <button onclick="showSection('home')" class="btn-home">홈으로</button>
-</div>
+        <div id="section-diary" class="content-section">
+            <h2>✏️ 감정 일기 작성</h2>
+            <select id="diary-score">
+                <option value="5">매우 좋음 😊</option>
+                <option value="3" selected>보통 😐</option>
+                <option value="1">매우 힘듦 😢</option>
+            </select>
+            <textarea id="diary-content" rows="5" placeholder="오늘의 마음을 남겨주세요."></textarea>
+            <button onclick="saveMood()">저장하기</button>
+            <button onclick="showSection('home')" class="btn-home">홈으로</button>
+        </div>
 
         <div id="section-community" class="content-section">
             <h2>🤝 마음 나눔 게시판</h2>
@@ -201,7 +219,6 @@
         let moodRecords = JSON.parse(localStorage.getItem('moodRecords')) || {};
         let myChart = null;
 
-        // 초기 테마 로드
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeButton(savedTheme);
@@ -214,15 +231,14 @@
             document.documentElement.setAttribute('data-theme', target);
             localStorage.setItem('theme', target);
             updateThemeButton(target);
-            if(myChart) drawChart(); // 테마 변경 시 차트 다시 그리기 (색상 대응)
+            if(myChart) drawChart();
         }
 
         function updateThemeButton(theme) {
             const btn = document.getElementById('theme-btn');
-            btn.innerText = theme === 'light' ? '🌙 다크모드' : '☀️ 라이트모드';
+            btn.innerText = theme === 'light' ? '🌙' : '☀️';
         }
 
-        // --- 이하 기존 로직과 동일 ---
         function showSection(id) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
@@ -256,7 +272,7 @@
 
         function updateAuthUI() {
             document.getElementById('user-display').innerText = currentUser.name + "님";
-            document.getElementById('auth-btn').innerText = "로그아웃";
+            document.getElementById('auth-btn').innerHTML = "👤 <span>마이페이지</span>";
             document.getElementById('auth-btn').onclick = () => { sessionStorage.removeItem('loginUser'); location.reload(); };
             document.getElementById('welcome-msg').innerText = currentUser.name + "님, 오늘 마음은 어떠세요?";
         }
@@ -280,7 +296,7 @@
 
             const ctx = document.getElementById('moodChart').getContext('2d');
             if(myChart) myChart.destroy();
-            
+
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
             myChart = new Chart(ctx, {
@@ -306,7 +322,6 @@
             });
         }
 
-        // 게시판 및 감정분석 로직 (기존과 동일)
         function postMsg() {
             const msg = document.getElementById('board-msg').value;
             if(!msg) return;
@@ -337,6 +352,12 @@
                 });
             } catch(e) { alert("카메라를 연결할 수 없습니다."); }
         }
+
+        document.getElementById('docs-list').innerHTML = `
+            <div class="doc-item"><span>감정 기록 가이드</span><span>PDF</span></div>
+            <div class="doc-item"><span>스트레스 관리 팁</span><span>DOC</span></div>
+            <div class="doc-item"><span>감정 표현 활동지</span><span>HWP</span></div>
+        `;
     </script>
 </body>
 </html>
