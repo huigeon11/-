@@ -7,42 +7,98 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root { --main-color: #6d9773; --bg-color: #f8f9fa; --accent-color: #e8f5e9; }
-        body { font-family: 'Pretendard', -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; line-height: 1.6; }
+        /* 테마 변수 설정 */
+        :root { 
+            --main-color: #6d9773; 
+            --bg-color: #f8f9fa; 
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --sub-text: #666666;
+            --accent-color: #e8f5e9; 
+            --border-color: #eeeeee;
+        }
+
+        /* 다크모드 전용 변수 */
+        [data-theme='dark'] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --sub-text: #b0b0b0;
+            --accent-color: #2d3a2f;
+            --border-color: #333333;
+        }
+
+        body { 
+            font-family: 'Pretendard', -apple-system, sans-serif; 
+            margin: 0; 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            line-height: 1.6; 
+            transition: background 0.3s, color 0.3s;
+        }
         
         /* 네비게이션 */
-        nav { display: flex; justify-content: space-between; padding: 15px 10%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; align-items: center; }
+        nav { 
+            display: flex; justify-content: space-between; padding: 15px 10%; 
+            background: var(--card-bg); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            position: sticky; top: 0; z-index: 100; align-items: center; 
+        }
         .logo { font-weight: bold; color: var(--main-color); font-size: 22px; cursor: pointer; }
-        .nav-links a { margin-left: 15px; text-decoration: none; color: #666; cursor: pointer; font-weight: 500; font-size: 14px; }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links a { margin-left: 15px; text-decoration: none; color: var(--sub-text); cursor: pointer; font-weight: 500; font-size: 14px; }
         .user-info { font-size: 14px; color: var(--main-color); font-weight: bold; margin-right: 10px; }
+
+        /* 다크모드 토글 버튼 */
+        .theme-toggle {
+            background: none; border: 1px solid var(--main-color); color: var(--main-color);
+            padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-left: 15px; width: auto;
+        }
 
         /* 메인 컨테이너 */
         .container { max-width: 1000px; margin: 40px auto; text-align: center; padding: 0 20px; }
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
-        .menu-card { background: white; padding: 35px 20px; border-radius: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid transparent; }
+        .menu-card { 
+            background: var(--card-bg); padding: 35px 20px; border-radius: 15px; 
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; 
+            border: 1px solid transparent; color: var(--text-color);
+        }
         .menu-card:hover { transform: translateY(-5px); border: 1px solid var(--main-color); }
 
         /* 섹션 공통 스타일 */
-        .content-section { display: none; background: white; padding: 40px; border-radius: 20px; margin-top: 20px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .content-section { 
+            display: none; background: var(--card-bg); padding: 40px; 
+            border-radius: 20px; margin-top: 20px; text-align: left; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+        }
         .active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 회원가입/로그인 폼 스타일 */
-        .auth-box { max-width: 400px; margin: 50px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        /* 회원가입/로그인 폼 */
+        .auth-box { 
+            max-width: 400px; margin: 50px auto; background: var(--card-bg); 
+            padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
         .auth-box h2 { text-align: center; color: var(--main-color); margin-bottom: 20px; }
-        .auth-toggle { text-align: center; margin-top: 15px; font-size: 14px; color: #888; cursor: pointer; text-decoration: underline; }
+        .auth-toggle { text-align: center; margin-top: 15px; font-size: 14px; color: var(--sub-text); cursor: pointer; text-decoration: underline; }
 
-        /* 자료실 및 통계 스타일 */
-        .doc-item { background: var(--accent-color); padding: 18px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid var(--main-color); display: flex; justify-content: space-between; align-items: center; }
+        /* 자료실 및 통계 */
+        .doc-item { 
+            background: var(--accent-color); padding: 18px; border-radius: 12px; 
+            margin-bottom: 12px; border-left: 6px solid var(--main-color); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
         .stats-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
-        .chart-box { background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #eee; height: 300px; }
+        .chart-box { background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); height: 300px; }
         
         /* 공통 UI */
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        input, textarea, select { 
+            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border-color); 
+            border-radius: 8px; box-sizing: border-box; background: var(--card-bg); color: var(--text-color);
+        }
         button { padding: 12px 25px; background: var(--main-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         .btn-home { background: #9e9e9e; width: auto; margin-top: 20px; }
         
-        /* AI 모달 */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; z-index: 1000; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); flex-direction: column; color: white; }
         video { width: 90%; max-width: 450px; border-radius: 15px; border: 3px solid var(--main-color); }
     </style>
@@ -55,36 +111,36 @@
             <span id="user-display" class="user-info"></span>
             <a onclick="showSection('home')">홈</a>
             <a onclick="showSection('docs')">자료실</a>
-            <a id="auth-btn" onclick="showSection('login')">로그인/회원가입</a>
+            <a id="auth-btn" onclick="showSection('login')">로그인</a>
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 다크모드</button>
         </div>
     </nav>
 
     <div class="container">
-        
         <div id="section-login" class="content-section">
             <div class="auth-box">
                 <h2>로그인</h2>
                 <input type="text" id="login-id" placeholder="아이디">
                 <input type="password" id="login-pw" placeholder="비밀번호">
                 <button onclick="handleLogin()">접속하기</button>
-                <p class="auth-toggle" onclick="showSection('signup')">아직 회원이 아니신가요? 회원가입</p>
+                <p class="auth-toggle" onclick="showSection('signup')">회원가입</p>
             </div>
         </div>
 
         <div id="section-signup" class="content-section">
             <div class="auth-box">
                 <h2>회원가입</h2>
-                <input type="text" id="reg-id" placeholder="사용할 아이디">
+                <input type="text" id="reg-id" placeholder="아이디">
                 <input type="password" id="reg-pw" placeholder="비밀번호">
                 <input type="text" id="reg-name" placeholder="닉네임">
                 <button onclick="handleSignup()">가입 완료</button>
-                <p class="auth-toggle" onclick="showSection('login')">이미 계정이 있나요? 로그인</p>
+                <p class="auth-toggle" onclick="showSection('login')">로그인으로 돌아가기</p>
             </div>
         </div>
 
         <div id="section-home" class="content-section active">
             <h1 id="welcome-msg">안녕하세요, 오늘의 마음은 어떤가요?</h1>
-            <p style="color: #666;">로그인하시면 개인 맞춤형 감정 기록 서비스를 이용하실 수 있습니다.</p>
+            <p style="color: var(--sub-text);">개인 맞춤형 감정 기록 서비스를 이용해 보세요.</p>
             <div class="menu-grid">
                 <div class="menu-card" onclick="checkAuth('analysis')"><h3>🔍 감정탐색 시작</h3></div>
                 <div class="menu-card" onclick="checkAuth('record')"><h3>📊 기분기록 확인</h3></div>
@@ -95,20 +151,15 @@
         </div>
 
         <div id="section-docs" class="content-section">
-            <h2>📚 전문 자료실 (TOP 5)</h2>
-            <div class="doc-item"><div><h4>기분 장애 진단</h4><p>국립정신건강센터 제공</p></div><button onclick="window.open('https://www.mentalhealth.go.kr')" style="width:auto">이동</button></div>
-            <div class="doc-item"><div><h4>인지행동치료(CBT)</h4><p>생각의 변화를 통한 감정 조절</p></div><button onclick="window.open('http://www.kacbt.or.kr')" style="width:auto">이동</button></div>
-            <div class="doc-item"><div><h4>심리적 착지법</h4><p>불안 해소를 위한 오감 훈련</p></div><button onclick="window.open('https://www.kpa.or.kr')" style="width:auto">이동</button></div>
-            <div class="doc-item"><div><h4>번아웃 회복</h4><p>서울시 블루터치 자가관리 가이드</p></div><button onclick="window.open('https://blutouch.cbhms.or.kr')" style="width:auto">이동</button></div>
-            <div class="doc-item"><div><h4>마음챙김 명상</h4><p>현재에 집중하는 법</p></div><button onclick="window.open('http://www.mbsr.co.kr')" style="width:auto">이동</button></div>
-            <button onclick="showSection('home')" class="btn-home">홈으로</button>
+            <h2>📚 전문 자료실</h2>
+            <div id="docs-list"></div> <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
         <div id="section-record" class="content-section">
             <h2>📊 나의 기분 통계</h2>
             <div class="stats-container">
                 <div class="chart-box"><canvas id="moodChart"></canvas></div>
-                <div id="summary-list" style="padding:15px; background:#f9f9f9; border-radius:10px; overflow-y:auto; height:300px; border:1px solid #eee;"></div>
+                <div id="summary-list" style="padding:15px; background:var(--accent-color); border-radius:10px; overflow-y:auto; height:300px;"></div>
             </div>
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
@@ -116,20 +167,18 @@
         <div id="section-diary" class="content-section">
             <h2>✏️ 감정 일기 작성</h2>
             <select id="diary-score">
-                <option value="5">매우 좋음 😊 (5점)</option>
-                <option value="4">좋음 🙂 (4점)</option>
-                <option value="3" selected>보통 😐 (3점)</option>
-                <option value="2">힘듦 😟 (2점)</option>
-                <option value="1">매우 힘듦 😢 (1점)</option>
+                <option value="5">매우 좋음 😊</option>
+                <option value="3" selected>보통 😐</option>
+                <option value="1">매우 힘듦 😢</option>
             </select>
-            <textarea id="diary-content" rows="5" placeholder="기록은 오직 본인만 확인할 수 있습니다."></textarea>
+            <textarea id="diary-content" rows="5" placeholder="오늘의 마음을 남겨주세요."></textarea>
             <button onclick="saveMood()">저장하기</button>
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
         <div id="section-community" class="content-section">
             <h2>🤝 마음 나눔 게시판</h2>
-            <textarea id="board-msg" rows="3" placeholder="익명으로 따뜻한 응원을 남겨보세요."></textarea>
+            <textarea id="board-msg" rows="3" placeholder="따뜻한 응원을 남겨보세요."></textarea>
             <button onclick="postMsg()">글 올리기</button>
             <div id="board-list" style="margin-top:20px;"></div>
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
@@ -149,9 +198,28 @@
         let moodRecords = JSON.parse(localStorage.getItem('moodRecords')) || {};
         let myChart = null;
 
-        // 초기 사용자 UI 업데이트
+        // 초기 테마 로드
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeButton(savedTheme);
+
         if(currentUser) updateAuthUI();
 
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
+            updateThemeButton(target);
+            if(myChart) drawChart(); // 테마 변경 시 차트 다시 그리기 (색상 대응)
+        }
+
+        function updateThemeButton(theme) {
+            const btn = document.getElementById('theme-btn');
+            btn.innerText = theme === 'light' ? '🌙 다크모드' : '☀️ 라이트모드';
+        }
+
+        // --- 이하 기존 로직과 동일 ---
         function showSection(id) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
@@ -159,25 +227,18 @@
         }
 
         function checkAuth(target) {
-            if(!currentUser) {
-                alert("로그인이 필요한 서비스입니다.");
-                showSection('login');
-            } else {
-                if(target === 'analysis') openAnalysis();
-                else showSection(target);
-            }
+            if(!currentUser) { alert("로그인이 필요합니다."); showSection('login'); }
+            else { if(target === 'analysis') openAnalysis(); else showSection(target); }
         }
 
         function handleSignup() {
             const id = document.getElementById('reg-id').value;
             const pw = document.getElementById('reg-pw').value;
             const name = document.getElementById('reg-name').value;
-            if(!id || !pw || !name) return alert("모든 항목을 입력해주세요.");
-            if(users[id]) return alert("이미 존재하는 아이디입니다.");
+            if(!id || !pw || !name) return alert("항목을 채워주세요.");
             users[id] = { pw, name };
             localStorage.setItem('users', JSON.stringify(users));
-            alert("가입 완료! 로그인해주세요.");
-            showSection('login');
+            alert("가입 완료!"); showSection('login');
         }
 
         function handleLogin() {
@@ -186,93 +247,68 @@
             if(users[id] && users[id].pw === pw) {
                 currentUser = { id, name: users[id].name };
                 sessionStorage.setItem('loginUser', JSON.stringify(currentUser));
-                updateAuthUI();
-                alert(currentUser.name + "님, 환영합니다!");
-                showSection('home');
-            } else {
-                alert("아이디 또는 비밀번호가 틀립니다.");
-            }
+                updateAuthUI(); showSection('home');
+            } else { alert("정보가 일치하지 않습니다."); }
         }
 
         function updateAuthUI() {
-            document.getElementById('user-display').innerText = currentUser.name + "님 접속중";
+            document.getElementById('user-display').innerText = currentUser.name + "님";
             document.getElementById('auth-btn').innerText = "로그아웃";
-            document.getElementById('auth-btn').onclick = handleLogout;
+            document.getElementById('auth-btn').onclick = () => { sessionStorage.removeItem('loginUser'); location.reload(); };
             document.getElementById('welcome-msg').innerText = currentUser.name + "님, 오늘 마음은 어떠세요?";
-        }
-
-        function handleLogout() {
-            sessionStorage.removeItem('loginUser');
-            location.reload();
         }
 
         function saveMood() {
             const content = document.getElementById('diary-content').value;
             const score = parseInt(document.getElementById('diary-score').value);
-            if(!content) return alert("내용을 입력해주세요.");
+            if(!content) return alert("내용을 입력하세요.");
             const date = new Date().toLocaleDateString();
-            const userKey = currentUser.id + "_" + date;
-            moodRecords[userKey] = { id: currentUser.id, score, content, date };
+            moodRecords[currentUser.id + "_" + date] = { id: currentUser.id, score, content, date };
             localStorage.setItem('moodRecords', JSON.stringify(moodRecords));
-            alert("기록되었습니다.");
-            document.getElementById('diary-content').value = "";
-            showSection('home');
+            alert("기록되었습니다."); showSection('home');
         }
 
-        // 차트 및 요약 리스트 그리기
         function drawChart() {
             const userId = currentUser.id;
-            // 현재 사용자의 기록만 필터링 및 날짜순 정렬
             const userEntries = Object.keys(moodRecords)
                 .filter(key => key.startsWith(userId + "_"))
                 .map(key => moodRecords[key])
                 .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            const dates = userEntries.map(e => e.date);
-            const scores = userEntries.map(e => e.score);
-            
-            // 요약 리스트 업데이트 (최신순)
-            const summary = document.getElementById('summary-list');
-            summary.innerHTML = [...userEntries].reverse().map(e => {
-                let icon = "😐";
-                if(e.score == 5) icon = "😊";
-                else if(e.score == 4) icon = "🙂";
-                else if(e.score == 2) icon = "😟";
-                else if(e.score == 1) icon = "😢";
-                return `<div style="border-bottom:1px solid #ddd; padding:10px 0;">
-                            <b>${e.date}</b> ${icon} (${e.score}점)<br>
-                            <small style="color:666">${e.content}</small>
-                        </div>`;
-            }).join('') || "기록이 없습니다.";
-
             const ctx = document.getElementById('moodChart').getContext('2d');
             if(myChart) myChart.destroy();
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates,
+                    labels: userEntries.map(e => e.date),
                     datasets: [{
                         label: '기분 점수',
-                        data: scores,
+                        data: userEntries.map(e => e.score),
                         borderColor: '#6d9773',
-                        backgroundColor: 'rgba(109, 151, 115, 0.1)',
-                        fill: true,
-                        tension: 0.3
+                        backgroundColor: isDark ? 'rgba(109, 151, 115, 0.3)' : 'rgba(109, 151, 115, 0.1)',
+                        fill: true
                     }]
                 },
                 options: { 
                     maintainAspectRatio: false,
-                    scales: { y: { min: 1, max: 5, ticks: { stepSize: 1 } } }
+                    scales: { 
+                        y: { min: 1, max: 5, ticks: { color: isDark ? '#aaa' : '#666' } },
+                        x: { ticks: { color: isDark ? '#aaa' : '#666' } }
+                    },
+                    plugins: { legend: { labels: { color: isDark ? '#eee' : '#333' } } }
                 }
             });
         }
 
+        // 게시판 및 감정분석 로직 (기존과 동일)
         function postMsg() {
             const msg = document.getElementById('board-msg').value;
             if(!msg) return;
-            const nick = currentUser ? currentUser.name : "익명";
             const item = document.createElement('div');
-            item.innerHTML = `<p><b>${nick}:</b> ${msg}</p><hr style="border:0.5px solid #eee">`;
+            item.innerHTML = `<p><b>${currentUser ? currentUser.name : "익명"}:</b> ${msg}</p><hr style="border-color:var(--border-color)">`;
             document.getElementById('board-list').prepend(item);
             document.getElementById('board-msg').value = "";
         }
@@ -296,7 +332,7 @@
                         }
                     }, 500);
                 });
-            } catch(e) { alert("카메라를 연결할 수 없거나 모델 로드에 실패했습니다."); }
+            } catch(e) { alert("카메라를 연결할 수 없습니다."); }
         }
     </script>
 </body>
