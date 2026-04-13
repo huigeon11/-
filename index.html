@@ -32,7 +32,7 @@
         .auth-box h2 { text-align: center; color: var(--main-color); margin-bottom: 20px; }
         .auth-toggle { text-align: center; margin-top: 15px; font-size: 14px; color: #888; cursor: pointer; text-decoration: underline; }
 
-        /* 자료실 및 통계 스타일 (기존 유지) */
+        /* 자료실 및 통계 스타일 */
         .doc-item { background: var(--accent-color); padding: 18px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid var(--main-color); display: flex; justify-content: space-between; align-items: center; }
         .stats-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
         .chart-box { background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #eee; height: 300px; }
@@ -108,14 +108,20 @@
             <h2>📊 나의 기분 통계</h2>
             <div class="stats-container">
                 <div class="chart-box"><canvas id="moodChart"></canvas></div>
-                <div id="summary-list" style="padding:10px; background:#f9f9f9; border-radius:10px; overflow-y:auto; height:300px;"></div>
+                <div id="summary-list" style="padding:15px; background:#f9f9f9; border-radius:10px; overflow-y:auto; height:300px; border:1px solid #eee;"></div>
             </div>
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
         </div>
 
         <div id="section-diary" class="content-section">
             <h2>✏️ 감정 일기 작성</h2>
-            <select id="diary-score"><option value="5">매우 좋음 😊</option><option value="3" selected>보통 😐</option><option value="1">매우 힘듦 😢</option></select>
+            <select id="diary-score">
+                <option value="5">매우 좋음 😊 (5점)</option>
+                <option value="4">좋음 🙂 (4점)</option>
+                <option value="3" selected>보통 😐 (3점)</option>
+                <option value="2">힘듦 😟 (2점)</option>
+                <option value="1">매우 힘듦 😢 (1점)</option>
+            </select>
             <textarea id="diary-content" rows="5" placeholder="기록은 오직 본인만 확인할 수 있습니다."></textarea>
             <button onclick="saveMood()">저장하기</button>
             <button onclick="showSection('home')" class="btn-home">홈으로</button>
@@ -152,7 +158,6 @@
             if(id === 'record') drawChart();
         }
 
-        // 권한 체크
         function checkAuth(target) {
             if(!currentUser) {
                 alert("로그인이 필요한 서비스입니다.");
@@ -163,26 +168,21 @@
             }
         }
 
-        // 회원가입
         function handleSignup() {
             const id = document.getElementById('reg-id').value;
             const pw = document.getElementById('reg-pw').value;
             const name = document.getElementById('reg-name').value;
-
             if(!id || !pw || !name) return alert("모든 항목을 입력해주세요.");
             if(users[id]) return alert("이미 존재하는 아이디입니다.");
-
             users[id] = { pw, name };
             localStorage.setItem('users', JSON.stringify(users));
-            alert("회원가입이 완료되었습니다! 로그인해주세요.");
+            alert("가입 완료! 로그인해주세요.");
             showSection('login');
         }
 
-        // 로그인
         function handleLogin() {
             const id = document.getElementById('login-id').value;
             const pw = document.getElementById('login-pw').value;
-
             if(users[id] && users[id].pw === pw) {
                 currentUser = { id, name: users[id].name };
                 sessionStorage.setItem('loginUser', JSON.stringify(currentUser));
@@ -206,69 +206,97 @@
             location.reload();
         }
 
-        // 일기 저장 (사용자별 구분)
         function saveMood() {
             const content = document.getElementById('diary-content').value;
             const score = parseInt(document.getElementById('diary-score').value);
-            if(!content) return;
-
+            if(!content) return alert("내용을 입력해주세요.");
             const date = new Date().toLocaleDateString();
             const userKey = currentUser.id + "_" + date;
-            
-            moodRecords[userKey] = { score, content, date };
+            moodRecords[userKey] = { id: currentUser.id, score, content, date };
             localStorage.setItem('moodRecords', JSON.stringify(moodRecords));
             alert("기록되었습니다.");
             document.getElementById('diary-content').value = "";
+            showSection('home');
         }
 
-        // 차트 그리기 (해당 유저의 데이터만 필터링)
+        // 차트 및 요약 리스트 그리기
         function drawChart() {
-            const userDocs = Object.values(moodRecords).filter(r => r.id === currentUser.id || Object.keys(moodRecords).some(k => k.startsWith(currentUser.id)));
-            const dates = [...new Set(Object.values(moodRecords).filter((v,i,a) => Object.keys(moodRecords)[i].startsWith(currentUser.id)).map(r => r.date))].sort();
-            const scores = dates.map(d => moodRecords[currentUser.id + "_" + d].score);
+            const userId = currentUser.id;
+            // 현재 사용자의 기록만 필터링 및 날짜순 정렬
+            const userEntries = Object.keys(moodRecords)
+                .filter(key => key.startsWith(userId + "_"))
+                .map(key => moodRecords[key])
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const dates = userEntries.map(e => e.date);
+            const scores = userEntries.map(e => e.score);
             
+            // 요약 리스트 업데이트 (최신순)
             const summary = document.getElementById('summary-list');
-            summary.innerHTML = dates.reverse().map(d => `<div style="border-bottom:1px solid #ddd; padding:5px;"><b>${d}</b>: ${moodRecords[currentUser.id+"_"+d].score}점</div>`).join('');
+            summary.innerHTML = [...userEntries].reverse().map(e => {
+                let icon = "😐";
+                if(e.score == 5) icon = "😊";
+                else if(e.score == 4) icon = "🙂";
+                else if(e.score == 2) icon = "😟";
+                else if(e.score == 1) icon = "😢";
+                return `<div style="border-bottom:1px solid #ddd; padding:10px 0;">
+                            <b>${e.date}</b> ${icon} (${e.score}점)<br>
+                            <small style="color:666">${e.content}</small>
+                        </div>`;
+            }).join('') || "기록이 없습니다.";
 
             const ctx = document.getElementById('moodChart').getContext('2d');
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: dates.reverse(), datasets: [{ label: '기분 변화', data: scores, borderColor: '#6d9773', fill: false }] },
-                options: { maintainAspectRatio: false }
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: '기분 점수',
+                        data: scores,
+                        borderColor: '#6d9773',
+                        backgroundColor: 'rgba(109, 151, 115, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { 
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 1, max: 5, ticks: { stepSize: 1 } } }
+                }
             });
         }
 
-        // 커뮤니티 (공용)
         function postMsg() {
             const msg = document.getElementById('board-msg').value;
             if(!msg) return;
             const nick = currentUser ? currentUser.name : "익명";
             const item = document.createElement('div');
-            item.innerHTML = `<p><b>${nick}:</b> ${msg}</p><hr>`;
+            item.innerHTML = `<p><b>${nick}:</b> ${msg}</p><hr style="border:0.5px solid #eee">`;
             document.getElementById('board-list').prepend(item);
             document.getElementById('board-msg').value = "";
         }
 
-        // AI (기존 코드 통합)
         async function openAnalysis() {
             document.getElementById('analysis-window').style.display = 'flex';
             const URL = 'https://raw.githubusercontent.com/vladmandic/face-api/master/model/';
-            await faceapi.nets.tinyFaceDetector.loadFromUri(URL);
-            await faceapi.nets.faceExpressionNet.loadFromUri(URL);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-            const v = document.getElementById('video');
-            v.srcObject = stream;
-            v.addEventListener('play', () => {
-                setInterval(async () => {
-                    const det = await faceapi.detectAllFaces(v, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
-                    if(det.length > 0) {
-                        const exp = det[0].expressions;
-                        const max = Object.keys(exp).reduce((a, b) => exp[a] > exp[b] ? a : b);
-                        document.getElementById('res-emotion').innerText = max;
-                    }
-                }, 500);
-            });
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri(URL);
+                await faceapi.nets.faceExpressionNet.loadFromUri(URL);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                const v = document.getElementById('video');
+                v.srcObject = stream;
+                v.addEventListener('play', () => {
+                    setInterval(async () => {
+                        const det = await faceapi.detectAllFaces(v, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+                        if(det.length > 0) {
+                            const exp = det[0].expressions;
+                            const max = Object.keys(exp).reduce((a, b) => exp[a] > exp[b] ? a : b);
+                            document.getElementById('res-emotion').innerText = max.toUpperCase();
+                        }
+                    }, 500);
+                });
+            } catch(e) { alert("카메라를 연결할 수 없거나 모델 로드에 실패했습니다."); }
         }
     </script>
 </body>
